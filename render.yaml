@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: keyword-check-hub
+    env: java
+    plan: free
+    build:
+      - command: ./mvnw clean install
+    start:
+      - command: java -jar target/app.jar
