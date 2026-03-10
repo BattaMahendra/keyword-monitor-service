@@ -4,9 +4,9 @@ spring:
 
   # Data Source Configuration
   datasource:
-    url: jdbc:postgresql://ep-cool-heart-a1h96adp-pooler.ap-southeast-1.aws.neon.tech/neondb
-    username: neondb_owner
-    password: npg_bROjZl2rJuI9
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   # JPA Configuration
@@ -27,12 +27,12 @@ spring:
 app:
   # SendGrid Configuration
   sendgrid:
-    api-key: ${SENDGRID_API_KEY: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}
+    api-key: ${SENDGRID_API_KEY}
     from-email: 174g1a0245@srit.ac.in # Replace with your verified SendGrid sender email
 
   # Telegram Configuration
   telegram:
-    bot-token: ${TELEGRAM_BOT_TOKEN:8515755514:AAHLuh-GsApYj0_mRz4NCmi5Xg7bdNEb1Y4}
+    bot-token: ${TELEGRAM_BOT_TOKEN}
     api-url: https://api.telegram.org/bot
 
   # Website monitoring configuration
