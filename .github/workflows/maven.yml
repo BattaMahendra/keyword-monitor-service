@@ -24,6 +24,12 @@ jobs:
       run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
 
     - name: Build with Maven
+      env:
+        DB_URL: ${{ secrets.DB_URL }}
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       run: mvn -B package --file pom.xml
 
     - name: Test
