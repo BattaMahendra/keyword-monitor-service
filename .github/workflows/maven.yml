@@ -20,8 +20,8 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Install Playwright
-      run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
+  #  - name: Install Playwright
+  #    run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
 
     - name: Build with Maven
       env:
