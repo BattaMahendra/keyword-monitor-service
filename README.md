@@ -22,12 +22,13 @@ When a new job matching my criteria was posted, I received an immediate notifica
 ## Technologies Used 💻
 
 - **Backend:** Java, Spring Boot, Spring Data JPA
+- **Frontend:** Thymeleaf, HTML, CSS, JavaScript, Bootstrap
 - **Database:** PostgreSQL
 - **Web Scraping:** Playwright
-- **Notifications:** Email (SMTP), Telegram Bot API
 - **Caching:** Spring Cache
-- **Frontend:** HTML, CSS, JavaScript, Bootstrap
-- **Deployment:** Render
+- **CI/CD:** GitHub Actions, Render
+- **Notifications:** SendGrid (Email), Telegram Bot API
+- **Database Hosting:** Neon DB
 
 ## Performance and Optimizations ⚡️
 
@@ -39,6 +40,27 @@ I've implemented several optimizations to ensure the application is fast and eff
 - **Optimized Database Queries:** Database queries are optimized for performance, with indexes on frequently queried columns.
 
 ## Architecture 🏗️
+
+### Full Development Lifecycle 🔄
+
+```
++-----------------+   +------------------+   +-----------------+   +-----------------+   +-----------------+
+|   Developer     |-->|  GitHub Repo     |-->|  GitHub Actions |-->|   Render.com    |-->|   End User      |
+| (VS Code/IDE)   |   | (Source Code)    |   | (CI - maven.yml)|   | (CD - Deployment)|   | (Web Browser)   |
++-----------------+   +------------------+   +-----------------+   +-----------------+   +-----------------+
+        ^                                                                    |
+        |                                                                    v
+        |                                                            +-----------------+
+        |                                                            |  Neon DB        |
+        |                                                            | (PostgreSQL)    |
+        |                                                            +-----------------+
+        |                                                                    |
+        |                                                                    v
+        |                                                            +-----------------+
+        |                                                            | SendGrid/Telegram|
+        |                                                            | (Notifications) |
+        +------------------------------------------------------------+-----------------+
+```
 
 ### API Interaction Flow 🌐
 

@@ -2,106 +2,135 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <!-- Responsive: Added viewport meta tag for proper mobile scaling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Keyword Monitor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* Custom CSS for URL truncation */
+        /* Custom CSS for URL truncation - kept existing, ensure it works with new layout */
         .url-link {
             display: inline-block;
-            max-width: 250px; /* Adjust as needed */
+            max-width: 250px; /* Adjust as needed for desktop */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
         }
+
+        /* Responsive: Adjust max-width for URL on smaller screens */
+        @media (max-width: 767.98px) {
+            .url-link {
+                max-width: 150px; /* Smaller max-width for mobile */
+            }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1 class="mt-5">Keyword Monitor</h1>
+<!-- Responsive: Use container-fluid for full width on all devices, or container for fixed width -->
+<!-- Using container for a slightly constrained width on larger screens, which looks better -->
+<div class="container my-4"> <!-- Responsive: Added margin-top and margin-bottom for spacing -->
+    <!-- Responsive: Improved typography and spacing -->
+    <h1 class="text-center my-5 display-4">Keyword Monitor</h1>
 
-    <div class="card mt-4">
-        <div class="card-header">
-            <h2>How It Works</h2>
-        </div>
-        <div class="card-body">
-            <p class="lead">Tired of manually checking websites for important updates? Let Keyword Monitor do the work for you!</p>
-            <p>This tool automatically tracks changes on any website you specify. Simply provide a URL and the keywords you're interested in, and we'll notify you via email or Telegram as soon as the keyword count increases.
-            </p>
-            <h5>A Real-World Example:</h5>
-            <p>
-                Imagine you're job hunting and waiting for a role to open up. You could monitor the Accenture careers page for keywords like "Backend Developer," "Spring Boot," and "Microservices." The moment a new position matching these terms is posted, you'll get an instant notification. No more constant manual checks!
-            </p>
-            <h5>Simple Steps to Get Started:</h5>
-            <ol>
-                <li><strong>Enter a URL:</strong> The website you want to track.</li>
-                <li><strong>Add Keywords:</strong> The specific terms you're looking for (e.g., "new arrivals," "job opening," "out of stock").</li>
-                <li><strong>Set Up Notifications:</strong> Provide your email or Telegram Chat ID.</li>
-                <li><strong>Relax:</strong> We'll let you know when something changes!</li>
-            </ol>
-            <p class="mt-4">
-                Curious about the code behind this project? You can check out the full source code on our GitHub repository.
-                <a href="https://github.com/BattaMahendra/keyword-monitor-service" target="_blank" class="btn btn-secondary btn-sm">
-                    <i class="bi bi-github"></i> View on GitHub
-                </a>
-            </p>
+    <!-- Responsive: Centering the card on desktop, full width on mobile -->
+    <div class="row justify-content-center mb-5"> <!-- Responsive: Added margin-bottom -->
+        <div class="col-12 col-md-10 col-lg-8"> <!-- Responsive: Full width on mobile, narrower on desktop -->
+            <div class="card shadow-sm"> <!-- Responsive: Added shadow for better visual appeal -->
+                <div class="card-header bg-primary text-white py-3"> <!-- Responsive: Improved header styling -->
+                    <h2 class="mb-0 fs-4">How It Works</h2> <!-- Responsive: Adjusted font size -->
+                </div>
+                <div class="card-body">
+                    <p class="lead">Tired of manually checking websites for important updates? Let Keyword Monitor do the work for you!</p>
+                    <p>This tool automatically tracks changes on any website you specify. Simply provide a URL and the keywords you're interested in, and we'll notify you via email or Telegram as soon as the keyword count increases.
+                    </p>
+                    <h5 class="mt-4">A Real-World Example:</h5>
+                    <p>
+                        Imagine you're job hunting and waiting for a role to open up. You could monitor the Accenture careers page for keywords like "Backend Developer," "Spring Boot," and "Microservices." The moment a new position matching these terms is posted, you'll get an instant notification. No more constant manual checks!
+                    </p>
+                    <h5 class="mt-4">Simple Steps to Get Started:</h5>
+                    <ol>
+                        <li><strong>Enter a URL:</strong> The website you want to track.</li>
+                        <li><strong>Add Keywords:</strong> The specific terms you're looking for (e.g., "new arrivals," "job opening," "out of stock").</li>
+                        <li><strong>Set Up Notifications:</strong> Provide your email or Telegram Chat ID.</li>
+                        <li><strong>Relax:</strong> We'll let you know when something changes!</li>
+                    </ol>
+                    <p class="mt-4">
+                        Curious about the code behind this project? You can check out the full source code on our GitHub repository.
+                        <a href="https://github.com/BattaMahendra/keyword-monitor-service" target="_blank" class="btn btn-secondary btn-sm mt-2"> <!-- Responsive: Added margin-top for button -->
+                            <i class="bi bi-github"></i> View on GitHub
+                        </a>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header">
-            Add New Site to Monitor
-        </div>
-        <div class="card-body">
-            <form id="monitorForm">
-                <div class="mb-3">
-                    <label for="url" class="form-label">URL</label>
-                    <input type="text" class="form-control" id="url" name="url" required>
+    <!-- Responsive: Centering the form card on desktop, full width on mobile -->
+    <div class="row justify-content-center mb-5"> <!-- Responsive: Added margin-bottom -->
+        <div class="col-12 col-md-10 col-lg-8"> <!-- Responsive: Full width on mobile, narrower on desktop -->
+            <div class="card shadow-sm"> <!-- Responsive: Added shadow -->
+                <div class="card-header bg-primary text-white py-3"> <!-- Responsive: Improved header styling -->
+                    <h2 class="mb-0 fs-4">Add New Site to Monitor</h2> <!-- Responsive: Adjusted font size -->
                 </div>
-                <div class="mb-3">
-                    <label for="keyword" class="form-label">Keywords (comma separated)</label>
-                    <input type="text" class="form-control" id="keyword" name="keyword" placeholder="e.g. keyword1, keyword2, keyword3" required>
-                    <div class="form-text">Enter multiple keywords separated by commas. Notifications will be sent if the count of any keyword increases.</div>
+                <div class="card-body">
+                    <form id="monitorForm">
+                        <div class="mb-3">
+                            <label for="url" class="form-label">URL</label>
+                            <input type="text" class="form-control" id="url" name="url" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="keyword" class="form-label">Keywords (comma separated)</label>
+                            <input type="text" class="form-control" id="keyword" name="keyword" placeholder="e.g. keyword1, keyword2, keyword3" required>
+                            <div class="form-text">Enter multiple keywords separated by commas. Notifications will be sent if the count of any keyword increases.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="telegramChatId" class="form-label">
+                                Telegram Chat ID
+                                <i class="bi bi-info-circle"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="right"
+                                   title="To get your chat ID, message @userinfobot on Telegram and copy the ID it provides."></i>
+                            </label>
+                            <input type="text" class="form-control" id="telegramChatId" name="telegramChatId">
+                        </div>
+                        <!-- Responsive: Buttons full width on mobile, normal on desktop -->
+                        <div class="d-grid d-md-block"> <!-- d-grid makes it full width on mobile, d-md-block reverts to block on medium+ -->
+                            <button type="submit" class="btn btn-primary">Add Monitor</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email">
-                </div>
-                <div class="mb-3">
-                    <label for="telegramChatId" class="form-label">
-                        Telegram Chat ID
-                        <i class="bi bi-info-circle"
-                           data-bs-toggle="tooltip"
-                           data-bs-placement="right"
-                           title="To get your chat ID, message @userinfobot on Telegram and copy the ID it provides."></i>
-                    </label>
-                    <input type="text" class="form-control" id="telegramChatId" name="telegramChatId">
-                </div>
-                <button type="submit" class="btn btn-primary">Add Monitor</button>
-            </form>
+            </div>
         </div>
     </div>
 
-    <h2 class="mt-5">Monitored Sites</h2>
-    <table class="table table-striped table-sm mt-4"> <!-- Added table-sm class -->
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>URL</th>
-            <th>Keywords</th>
-            <th>Email</th>
-            <th>Telegram Chat ID</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody id="monitoredSites">
-        </tbody>
-    </table>
+    <!-- Responsive: Monitored Sites section -->
+    <h2 class="text-center my-5 display-5">Monitored Sites</h2> <!-- Responsive: Improved typography and spacing -->
+    <!-- Responsive: Make tables responsive using Bootstrap (table-responsive) -->
+    <div class="table-responsive mb-5"> <!-- Responsive: Added margin-bottom -->
+        <table class="table table-striped table-hover align-middle"> <!-- Responsive: Added table-hover and align-middle -->
+            <thead class="table-dark"> <!-- Responsive: Dark header for better contrast -->
+            <tr>
+                <th>ID</th>
+                <th>URL</th>
+                <th>Keywords</th>
+                <th>Email</th>
+                <th>Telegram Chat ID</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="monitoredSites">
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<footer class="text-center mt-5 py-3 bg-light">
-    <p class="mb-0">Developed by Batta Mahendra &mdash; <em>Curiosity in Code.</em></p>
+<footer class="text-center mt-5 py-3 bg-light border-top"> <!-- Responsive: Added border-top for separation -->
+    <p class="mb-0 text-muted">Developed by Batta Mahendra &mdash; <em>Curiosity in Code.</em></p> <!-- Responsive: Muted text color -->
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -132,13 +161,31 @@
                                     <td>${site.email}</td>
                                     <td>${site.telegramChatId}</td>
                                     <td>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteMonitor(${site.id})">Delete</button>
+                                        <!-- Responsive: Delete button full width on mobile, normal on desktop -->
+                                        <div class="d-grid d-md-block">
+                                            <button class="btn btn-danger btn-sm" onclick="deleteMonitor(${site.id})">Delete</button>
+                                        </div>
                                     </td>
                                 </tr>
                             `;
                             monitoredSites.innerHTML += row;
                         });
+                    } else {
+                        // Responsive: Display message if no sites are monitored
+                        monitoredSites.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center py-3">No sites currently monitored. Add one above!</td>
+                            </tr>
+                        `;
                     }
+                })
+                .catch(error => {
+                    console.error('Error fetching monitored sites:', error);
+                    monitoredSites.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center text-danger py-3">Failed to load monitored sites. Please try again later.</td>
+                        </tr>
+                    `;
                 });
         }
 
@@ -163,6 +210,10 @@
                 } else {
                     alert('Error: ' + data.message);
                 }
+            })
+            .catch(error => {
+                console.error('Error adding monitor:', error);
+                alert('An error occurred while adding the monitor. Please try again.');
             });
         });
 
@@ -179,6 +230,10 @@
                     } else {
                         alert('Error: ' + data.message);
                     }
+                })
+                .catch(error => {
+                    console.error('Error deleting monitor:', error);
+                    alert('An error occurred while deleting the monitor. Please try again.');
                 });
             }
         }
