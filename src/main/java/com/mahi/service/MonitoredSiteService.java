@@ -223,12 +223,30 @@ public class MonitoredSiteService {
                 .url(site.getUrl())
                 .keywords(keywordStrings)
                 .keyword(String.join(", ", keywordStrings)) // For UI backward compatibility
-                .email(site.getEmail())
-                .telegramChatId(site.getTelegramChatId())
+                .email(maskEmail(site.getEmail()))
+                .telegramChatId(maskTelegramChatId(site.getTelegramChatId()))
                 .lastChecked(site.getLastChecked())
                 .createdAt(site.getCreatedAt())
                 .updatedAt(site.getUpdatedAt())
                 .isActive(site.getIsActive())
                 .build();
+    }
+
+    private String maskEmail(String email) {
+        if (!StringUtils.hasText(email)) {
+            return "";
+        }
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 2) {
+            return email; // Not enough characters to mask
+        }
+        return email.substring(0, 2) + "***" + email.substring(atIndex);
+    }
+
+    private String maskTelegramChatId(String chatId) {
+        if (!StringUtils.hasText(chatId) || chatId.length() <= 4) {
+            return chatId; // Not enough characters to mask
+        }
+        return chatId.substring(0, 2) + "***" + chatId.substring(chatId.length() - 2);
     }
 }

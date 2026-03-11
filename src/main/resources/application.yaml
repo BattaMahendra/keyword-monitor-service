@@ -38,7 +38,7 @@ app:
   # Website monitoring configuration
   monitor:
     check-interval: 300000  # 5 minutes in milliseconds
-    connection-timeout: 10000  # 10 seconds
+    connection-timeout: 30000  # 30 seconds
     read-timeout: 10000  # 10 seconds
     user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 
