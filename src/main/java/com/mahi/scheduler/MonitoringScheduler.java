@@ -5,10 +5,12 @@ import com.mahi.service.MonitoredSiteService;
 import com.mahi.service.WebsiteMonitorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,6 +25,10 @@ public class MonitoringScheduler {
 
     @Autowired
     private WebsiteMonitorService websiteMonitorService;
+
+    @Autowired
+    @Qualifier("taskExecutor")
+    private Executor taskExecutor;
 
     /**
      * Run website monitoring every 5 minutes
@@ -43,12 +49,14 @@ public class MonitoringScheduler {
             log.info("Found {} sites to check", sitesToCheck.size());
 
             for (MonitoredSite site : sitesToCheck) {
-                try {
-                    websiteMonitorService.monitorSite(site);
-                } catch (Exception e) {
-                    log.error("Error monitoring site {}", site.getId(), e);
-                    // Continue with next site even if one fails
-                }
+                taskExecutor.execute(() -> {
+                    try {
+                        websiteMonitorService.monitorSite(site);
+                    } catch (Exception e) {
+                        log.error("Error monitoring site {}", site.getId(), e);
+                        // Continue with next site even if one fails
+                    }
+                });
             }
 
             log.info("=== Scheduled website monitoring completed ===");
@@ -72,4 +80,3 @@ public class MonitoringScheduler {
         }
     }
 }
-
