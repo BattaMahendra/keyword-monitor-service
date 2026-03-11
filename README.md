@@ -2,7 +2,7 @@
 
 [![CI/CD](https://github.com/BattaMahendra/keyword-monitor-service/actions/workflows/maven.yml/badge.svg)](https://github.com/BattaMahendra/keyword-monitor-service/actions/workflows/maven.yml)
 
-Tired of manually checking websites for job openings or other important updates? Keyword Monitor is here to help! This service automates the process of tracking keywords on websites and notifies you as soon as they appear.
+Tired of manually checking websites for job openings or other important updates? Keyword Monitor is here to help! This service automates the process of tracking keywords on websites and notifies you as soon as they appear.   
 
 **Live Application:** [https://keyword-monitor-service.onrender.com/](https://keyword-monitor-service.onrender.com/)
 
