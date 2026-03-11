@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Scheduler for monitoring websites at regular intervals
@@ -27,7 +28,7 @@ public class MonitoringScheduler {
      * Run website monitoring every 5 minutes
      * This method is executed at fixed rate of 300000 milliseconds (5 minutes)
      */
-    @Scheduled(fixedRate = 60000, initialDelay = 5000)
+    @Scheduled(fixedRateString  = "${scheduler.keyword.fixedRate}", initialDelayString ="${scheduler.keyword.initialDelay}" ,timeUnit = TimeUnit.MINUTES)
     public void checkWebsites() {
         log.info("=== Starting scheduled website monitoring ===");
 
@@ -61,7 +62,7 @@ public class MonitoringScheduler {
      * Health check scheduler - runs every 10 minutes
      * Logs the current active monitored sites count
      */
-    @Scheduled(fixedRate = 100000, initialDelay = 10000)
+    @Scheduled(fixedRateString  = "${scheduler.health.fixedRate}", initialDelayString ="${scheduler.health.initialDelay}" ,timeUnit = TimeUnit.MINUTES)
     public void healthCheck() {
         try {
             List<MonitoredSite> activeSites = monitoredSiteService.getSitesToCheck();

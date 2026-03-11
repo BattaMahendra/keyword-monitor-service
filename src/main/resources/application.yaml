@@ -62,3 +62,10 @@ server:
     context-path: /
   compression:
     enabled: true
+scheduler:
+  keyword:
+    fixedRate: 1
+    initialDelay: 1
+  health:
+    fixedRate: 30
+    initialDelay: 1
