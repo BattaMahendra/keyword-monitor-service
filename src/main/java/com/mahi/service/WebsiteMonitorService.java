@@ -9,18 +9,17 @@ import com.mahi.notification.EmailNotificationService;
 import com.mahi.notification.TelegramNotificationService;
 import com.mahi.repository.AlertHistoryRepository;
 import com.mahi.repository.MonitoredSiteRepository;
+import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.WaitUntilState;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,26 +28,27 @@ import java.util.regex.Pattern;
 @Transactional
 public class WebsiteMonitorService {
 
-    @Autowired
-    private MonitoredSiteRepository monitoredSiteRepository;
+    private final MonitoredSiteRepository monitoredSiteRepository;
+    private final AlertHistoryRepository alertHistoryRepository;
+    private final EmailNotificationService emailNotificationService;
+    private final TelegramNotificationService telegramNotificationService;
+    private final int connectionTimeout;
+    private final String userAgent;
 
     @Autowired
-    private AlertHistoryRepository alertHistoryRepository;
-
-    @Autowired
-    private EmailNotificationService emailNotificationService;
-
-    @Autowired
-    private TelegramNotificationService telegramNotificationService;
-
-    @Value("${app.monitor.connection-timeout:10000}")
-    private int connectionTimeout;
-
-    @Value("${app.monitor.read-timeout:10000}")
-    private int readTimeout;
-
-    @Value("${app.monitor.user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36}")
-    private String userAgent;
+    public WebsiteMonitorService(MonitoredSiteRepository monitoredSiteRepository,
+                                 AlertHistoryRepository alertHistoryRepository,
+                                 EmailNotificationService emailNotificationService,
+                                 TelegramNotificationService telegramNotificationService,
+                                 @Value("${app.monitor.connection-timeout:30000}") int connectionTimeout,
+                                 @Value("${app.monitor.user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36}") String userAgent) {
+        this.monitoredSiteRepository = monitoredSiteRepository;
+        this.alertHistoryRepository = alertHistoryRepository;
+        this.emailNotificationService = emailNotificationService;
+        this.telegramNotificationService = telegramNotificationService;
+        this.connectionTimeout = connectionTimeout;
+        this.userAgent = userAgent;
+    }
 
     public void monitorSite(MonitoredSite site) {
         log.info("Starting monitoring for site: {}", site.getUrl());
@@ -81,20 +81,24 @@ public class WebsiteMonitorService {
         }
     }
 
-    private String fetchWebsiteContent(String url) {
-        try {
-            log.debug("Fetching content from: {}", url);
-            Document doc = Jsoup.connect(url)
-                    .userAgent(userAgent)
-                    .timeout(connectionTimeout)
-                    .get();
-            String text = doc.text();
+    @Cacheable("urlContent")
+    public String fetchWebsiteContent(String url) {
+        try (Playwright playwright = Playwright.create()) {
+            log.debug("Fetching content from: {} using Playwright", url);
+            Browser browser = playwright.chromium().launch();
+            BrowserContext context = browser.newContext(new Browser.NewContextOptions().setUserAgent(userAgent));
+            Page page = context.newPage();
+            page.navigate(url, new Page.NavigateOptions()
+                    .setTimeout(connectionTimeout)
+                    .setWaitUntil(WaitUntilState.NETWORKIDLE));
+            String text = page.textContent("body");
             log.debug("Successfully fetched {} characters from {}", text.length(), url);
+            browser.close();
             return text;
-        } catch (IOException e) {
-            throw new WebsiteScrapingException(url, "Connection timeout or network error", e);
+        } catch (PlaywrightException e) {
+            throw new WebsiteScrapingException(url, "Playwright error: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new WebsiteScrapingException(url, e.getMessage(), e);
+            throw new WebsiteScrapingException(url, "An unexpected error occurred during scraping: " + e.getMessage(), e);
         }
     }
 
@@ -139,7 +143,7 @@ public class WebsiteMonitorService {
             }
         }
 
-        recordAlert(site, keywordDetail.getKeyword(), true, emailSent, telegramSent);
+        recordAlert(site, keywordDetail.getKeyword(), emailSent, telegramSent);
     }
 
     private void sendEmailNotification(MonitoredSite site, KeywordDetail keywordDetail, int newCount) {
@@ -156,39 +160,42 @@ public class WebsiteMonitorService {
     }
 
     private String buildEmailMessage(MonitoredSite site, KeywordDetail keywordDetail, int newCount) {
-        return String.format(
-                "Keyword Alert Notification\n\n" +
-                "Keyword: %s\n" +
-                "New Count: %d (Previous: %d)\n" +
-                "Website: %s\n" +
-                "Time: %s\n\n" +
-                "The count for keyword '%s' has increased on %s.",
+        return String.format("""
+                Keyword Alert Notification
+
+                Keyword: %s
+                New Count: %d (Previous: %d)
+                Website: %s
+                Time: %s
+
+                The count for keyword '%s' has increased on %s.""",
                 keywordDetail.getKeyword(), newCount, keywordDetail.getLastCount(), site.getUrl(), LocalDateTime.now(),
                 keywordDetail.getKeyword(), site.getUrl()
         );
     }
 
     private String buildTelegramMessage(MonitoredSite site, KeywordDetail keywordDetail, int newCount) {
-        return String.format(
-                "🔔 *Keyword Count Increased!*\n\n" +
-                "🔑 Keyword: `%s`\n" +
-                "📈 New Count: *%d* (Previous: %d)\n" +
-                "🌐 Website: %s\n" +
-                "⏰ Time: %s",
+        return String.format("""
+                🔔 *Keyword Count Increased!*
+
+                🔑 Keyword: `%s`
+                📈 New Count: *%d* (Previous: %d)
+                🌐 Website: %s
+                ⏰ Time: %s""",
                 keywordDetail.getKeyword(), newCount, keywordDetail.getLastCount(), site.getUrl(), LocalDateTime.now()
         );
     }
 
     private boolean hasRecentAlert(Long siteId, String keyword) {
-        LocalDateTime oneHourAgo = LocalDateTime.now().minus(1, ChronoUnit.HOURS);
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
         return alertHistoryRepository.hasRecentAlertForKeyword(siteId, keyword, oneHourAgo);
     }
 
-    private void recordAlert(MonitoredSite site, String keyword, boolean keywordFound, boolean emailSent, boolean telegramSent) {
+    private void recordAlert(MonitoredSite site, String keyword, boolean emailSent, boolean telegramSent) {
         String message = String.format("Keyword '%s' count increased on %s", keyword, site.getUrl());
         AlertHistory alert = AlertHistory.builder()
                 .siteId(site.getId())
-                .keywordFound(keywordFound)
+                .keywordFound(true)
                 .message(message)
                 .alertTime(LocalDateTime.now())
                 .emailSent(emailSent)

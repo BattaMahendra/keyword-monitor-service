@@ -9,6 +9,8 @@ import com.mahi.repository.AlertHistoryRepository;
 import com.mahi.repository.MonitoredSiteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -39,6 +41,7 @@ public class MonitoredSiteService {
      * @param request the create monitor request
      * @return the created monitored site response
      */
+    @CacheEvict(value = "monitors", allEntries = true)
     public MonitoredSiteResponse createMonitor(CreateMonitorRequest request) {
         log.info("Creating new monitored site for URL: {}", request.getUrl());
 
@@ -70,6 +73,7 @@ public class MonitoredSiteService {
      *
      * @return list of monitored site responses
      */
+    @Cacheable("monitors")
     public List<MonitoredSiteResponse> getAllMonitors() {
         log.debug("Fetching all monitored sites");
         return monitoredSiteRepository.findByIsActiveTrue()
@@ -84,6 +88,7 @@ public class MonitoredSiteService {
      * @param id the site ID
      * @return the monitored site response
      */
+    @Cacheable(value = "monitors", key = "#id")
     public MonitoredSiteResponse getMonitorById(Long id) {
         log.debug("Fetching monitored site with ID: {}", id);
         MonitoredSite site = monitoredSiteRepository.findById(id)
@@ -99,6 +104,7 @@ public class MonitoredSiteService {
      * @param request the update request
      * @return the updated monitored site response
      */
+    @CacheEvict(value = "monitors", allEntries = true)
     public MonitoredSiteResponse updateMonitor(Long id, CreateMonitorRequest request) {
         log.info("Updating monitored site with ID: {}", id);
 
@@ -156,6 +162,7 @@ public class MonitoredSiteService {
      *
      * @param id the site ID
      */
+    @CacheEvict(value = "monitors", allEntries = true)
     public void deleteMonitor(Long id) {
         log.info("Deleting monitored site with ID: {}", id);
 
