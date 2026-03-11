@@ -31,7 +31,7 @@ public class MonitoredSite {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String url;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String keyword; // Re-added to satisfy DB schema
 
     @OneToMany(mappedBy = "monitoredSite", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
