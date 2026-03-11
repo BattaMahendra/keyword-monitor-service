@@ -37,8 +37,8 @@ app:
 
   # Website monitoring configuration
   monitor:
-    check-interval: 300000  # 5 minutes in milliseconds
-    connection-timeout: 30000  # 30 seconds
+    check-interval: 400000  # 5 minutes in milliseconds
+    connection-timeout: 60000  # 60 seconds
     read-timeout: 10000  # 10 seconds
     user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 
@@ -64,8 +64,8 @@ server:
     enabled: true
 scheduler:
   keyword:
-    fixedRate: 1
+    fixedRate: 15
     initialDelay: 1
   health:
-    fixedRate: 30
+    fixedRate: 600
     initialDelay: 1

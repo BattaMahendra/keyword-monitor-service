@@ -10,6 +10,7 @@ import com.mahi.notification.TelegramNotificationService;
 import com.mahi.repository.AlertHistoryRepository;
 import com.mahi.repository.MonitoredSiteRepository;
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitUntilState;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,12 +86,12 @@ public class WebsiteMonitorService {
     public String fetchWebsiteContent(String url) {
         try (Playwright playwright = Playwright.create()) {
             log.debug("Fetching content from: {} using Playwright", url);
-            Browser browser = playwright.chromium().launch();
+            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
             BrowserContext context = browser.newContext(new Browser.NewContextOptions().setUserAgent(userAgent));
             Page page = context.newPage();
             page.navigate(url, new Page.NavigateOptions()
                     .setTimeout(connectionTimeout)
-                    .setWaitUntil(WaitUntilState.NETWORKIDLE));
+                    .setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
             String text = page.textContent("body");
             log.debug("Successfully fetched {} characters from {}", text.length(), url);
             browser.close();
